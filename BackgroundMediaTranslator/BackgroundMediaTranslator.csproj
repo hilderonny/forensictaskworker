@@ -1,0 +1,58 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="argos-translate\**" />
+    <Compile Remove="data\**" />
+    <Compile Remove="faster-whisper\**" />
+    <Compile Remove="python\**" />
+    <EmbeddedResource Remove="argos-translate\**" />
+    <EmbeddedResource Remove="data\**" />
+    <EmbeddedResource Remove="faster-whisper\**" />
+    <EmbeddedResource Remove="python\**" />
+    <None Remove="argos-translate\**" />
+    <None Remove="data\**" />
+    <None Remove="faster-whisper\**" />
+    <None Remove="python\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Scripts\BackgroundMediaTranslatorCLI.py" />
+    <None Remove="Scripts\requirements.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Scripts\BackgroundMediaTranslatorCLI.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\requirements.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="AppSettings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>AppSettings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="AppSettings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>AppSettings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+</Project>
