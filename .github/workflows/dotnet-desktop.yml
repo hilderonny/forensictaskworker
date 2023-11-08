@@ -17,7 +17,7 @@ jobs:
     runs-on: windows-latest  
 
     env:
-      Solution_Name: ImageClassificator.sln
+      Solution_Name: BackgroundMediaTranslator.sln
 
     steps:
     - name: Checkout
