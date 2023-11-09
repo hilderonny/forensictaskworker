@@ -33,7 +33,7 @@ jobs:
 
     # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
     - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v1.0.2
+      uses: microsoft/setup-msbuild@v1.3.1
 
     # Restore the application to populate the obj folder with RuntimeIdentifiers
     - name: Restore the application
@@ -53,26 +53,16 @@ jobs:
       run: echo "::set-output name=version::$([xml]$Data=Get-Content ./BackgroundMediaTranslator/BackgroundMediaTranslator.csproj;$Data.Project.PropertyGroup.Version)"
 
     - name: Zip Folder
-      run: Compress-Archive -Path ./BackgroundMediaTranslator/bin/Release/net6.0-windows/* -DestinationPath ./BackgroundMediaTranslator.zip        
+      run: Compress-Archive -Path ./BackgroundMediaTranslator/bin/Release/net6.0-windows/* -DestinationPath ./BackgroundMediaTranslator_${{ steps.package_version.version }}.zip
 
-    - name: Create release
-      uses: actions/create-release@v1
-      id: create_release
+    - name: Create or update release
+      uses: ncipollo/release-action@v1
       with:
-        draft: false
-        prerelease: false
-        release_name: ${{ steps.version.outputs.version }}
-        tag_name: v${{ steps.version.outputs.version }}
-        body_path: CHANGELOG.md
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-
-    - name: Upload artifacts to release
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./BackgroundMediaTranslator.zip
-        asset_name: BackgroundMediaTranslator_${{ steps.package_version.version }}.zip
-        asset_content_type: application/zip
+        artifacts: "./BackgroundMediaTranslator_${{ steps.package_version.version }}.zip"
+        tag: v${{ steps.version.outputs.version }}
+        allowUpdates: true
+        name: ${{ steps.version.outputs.version }}
+        bodyFile: CHANGELOG.md
+        replacesArtifacts: true
+        token: ${{ github.token }}
+        artifactContentType: application/zip
