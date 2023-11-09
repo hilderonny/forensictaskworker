@@ -53,12 +53,12 @@ jobs:
       run: echo "::set-output name=version::$([xml]$Data=Get-Content ./BackgroundMediaTranslator/BackgroundMediaTranslator.csproj;$Data.Project.PropertyGroup.Version)"
 
     - name: Zip Folder
-      run: Compress-Archive -Path ./BackgroundMediaTranslator/bin/Release/net6.0-windows/* -DestinationPath ./BackgroundMediaTranslator_${{ steps.package_version.version }}.zip
+      run: Compress-Archive -Path ./BackgroundMediaTranslator/bin/Release/net6.0-windows/* -DestinationPath ./BackgroundMediaTranslator_${{ steps.version.outputs.version }}.zip
 
     - name: Create or update release
       uses: ncipollo/release-action@v1
       with:
-        artifacts: "./BackgroundMediaTranslator_${{ steps.package_version.version }}.zip"
+        artifacts: "./BackgroundMediaTranslator_${{ steps.version.outputs.version }}.zip"
         tag: v${{ steps.version.outputs.version }}
         allowUpdates: true
         name: ${{ steps.version.outputs.version }}
