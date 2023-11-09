@@ -63,6 +63,7 @@ jobs:
         allowUpdates: true
         name: ${{ steps.version.outputs.version }}
         bodyFile: CHANGELOG.md
+        removeArtifact: true
         replacesArtifacts: true
         token: ${{ github.token }}
         artifactContentType: application/zip
