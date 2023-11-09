@@ -702,36 +702,16 @@
 
         private TabControl tabControl;
         private TabPage tabPageHome;
-        private GroupBox groupBox1;
-        private TableLayoutPanel tableLayoutPanel2;
         private TabPage tabPageSettings;
-        private Label label1;
-        private Label label2;
-        private Label label3;
-        private Label label4;
         private Label labelHomeInputPath;
         private Label labelHomeProcessingPath;
         private Label labelHomeOutputPath;
         private Label labelHomeWhisperModel;
-        private Button buttonHomeChangeSettings;
         private Button buttonHomeStart;
-        private GroupBox groupBox2;
         private RichTextBox richTextBoxConsoleOutput;
-        private TableLayoutPanel tableLayoutPanel4;
-        private GroupBox groupBox3;
-        private GroupBox groupBox4;
-        private TableLayoutPanel tableLayoutPanel5;
-        private Label label9;
-        private Label label10;
-        private Label label11;
         private Label labelSettingsInputPath;
         private Label labelSettingsProcessingPath;
         private Label labelSettingsOutputPath;
-        private Button buttonSettingsChooseInputPath;
-        private Button buttonSettingsChooseProcessingPath;
-        private Button buttonSettingsChooseOutputPath;
-        private TableLayoutPanel tableLayoutPanel6;
-        private Label label15;
         private ComboBox comboBoxSettingsWhisperModel;
         private Label labelHomePythonPath;
         private Label labelHomeWhisperPath;
@@ -740,7 +720,6 @@
         private Label labelSettingsWhisperPath;
         private Button buttonSettingsChooseWhisperPath;
         private Label labelHomeArgosPath;
-        private Label label13;
         private Label labelSettingsArgosPath;
     }
 }
