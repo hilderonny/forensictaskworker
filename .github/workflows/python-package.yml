@@ -1,4 +1,4 @@
-name: .NET Core Desktop
+name: ZIP contents
 
 on:
   push:
@@ -16,38 +16,13 @@ jobs:
 
     runs-on: windows-latest  
 
-    env:
-      Solution_Name: BackgroundMediaTranslator.sln
-
     steps:
     - name: Checkout
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
 
-    # Install the .NET Core workload
-    - name: Install .NET Core
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 6.0.x
-
-    # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
-    - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v1.3.1
-
-    # Restore the application to populate the obj folder with RuntimeIdentifiers
-    - name: Restore the application
-      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
-      env:
-        Configuration: ${{ matrix.configuration }}
-
-    # Create the app package by building and packaging the Windows Application Packaging project
-    - name: Create the app
-      run: msbuild $env:Solution_Name /p:Configuration=$env:Configuration
-      env:
-        Configuration: ${{ matrix.configuration }}
-
-    # Determine app version
+    # TODO: Aus Script raus holen
     - name: Determine app version
       id: version
       run: echo "::set-output name=version::$([xml]$Data=Get-Content ./BackgroundMediaTranslator/BackgroundMediaTranslator.csproj;$Data.Project.PropertyGroup.Version)"

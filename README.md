@@ -1,11 +1,6 @@
 # background-media-translator
 
-Background worker with graphical user interface for transcribing and translating media files dropped in a folder. This project consists of two parts:
-
-1. **BackgroundMediaTranslatorCLI** - Python command line executable which can be run via console and which is used by the graphical part below
-1. **BackgroundMediaTranslator** - Graphical windows application for easy configuration of the command line interface
-
-[![.NET Core Desktop](https://github.com/hilderonny/background-media-translator/actions/workflows/dotnet-desktop.yml/badge.svg)](https://github.com/hilderonny/background-media-translator/actions/workflows/dotnet-desktop.yml)
+Background worker for transcribing and translating media files dropped in a folder. 
 
 ## Installation and running
 
