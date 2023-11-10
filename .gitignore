@@ -1,6 +1,3 @@
-.vs/
-bin/
-obj/
 data/
 python/
 faster-whisper/
