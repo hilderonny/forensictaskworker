@@ -3,4 +3,6 @@
  -i .\data\input^
  -p .\data\processing^
  -o .\data\output^
- -w ...
+ -w .\faster-whisper^
+ -a .\argos-translate^
+ -m large-v2

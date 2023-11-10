@@ -1,3 +1,5 @@
+PROGRAM_VERSION = '1.1.0'
+
 import time
 import os
 import json
@@ -14,6 +16,7 @@ parser.add_argument('--outputpath', '-o', type=str, action='store', required=Tru
 parser.add_argument('--whisperpath', '-w', type=str, action='store', required=True, help='Directory where the Faster-Whisper models are stored.')
 parser.add_argument('--argospath', '-a', type=str, action='store', required=True, help='Directory where the Argos Translate models are stored.')
 parser.add_argument('--whispermodel', '-m', type=str, default='small', action='store', help='Whisper model size to use. Can be "tiny", "base", "small" (default), "medium" or "large-v2".')
+parser.add_argument('--version', '-v', action='version', version=PROGRAM_VERSION)
 args = parser.parse_args()
 
 # Check write access to directories
@@ -65,8 +68,8 @@ whisper_model = WhisperModel( model_size_or_path = args.whispermodel, device = '
 
 # Load Argos translate
 print('Loading Argos Translate')
-os.environ["ARGOS_PACKAGES_DIR"] = os.path.join(args.argospath, "packages")
-os.environ["ARGOS_DEVICE_TYPE"] = 'cpu'
+os.environ['ARGOS_PACKAGES_DIR'] = os.path.join(args.argospath, 'packages')
+os.environ['ARGOS_DEVICE_TYPE'] = 'cpu'
 global argos_translation
 import argostranslate.translate
 argos_translation = argostranslate.translate.get_translation_from_codes('en', 'de')
