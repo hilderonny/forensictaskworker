@@ -10,8 +10,8 @@ import stat
 # Parse command line arguments
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument('--inputpath', '-i', type=str, action='store', required=True, help='Directory where the images to process are obtained from. Must be writable.')
-parser.add_argument('--processingpath', '-p', type=str, action='store', required=True, help='Directory where the currently processed image gets stored. Must be writable.')
+parser.add_argument('--inputpath', '-i', type=str, action='store', required=True, help='Directory where the media files to process are obtained from. Must be writable.')
+parser.add_argument('--processingpath', '-p', type=str, action='store', required=True, help='Directory where the currently processed media file gets stored. Must be writable.')
 parser.add_argument('--outputpath', '-o', type=str, action='store', required=True, help='Directory where the output JSON files will be stored. Must be writable.')
 parser.add_argument('--whisperpath', '-w', type=str, action='store', required=True, help='Directory where the Faster-Whisper models are stored.')
 parser.add_argument('--argospath', '-a', type=str, action='store', required=True, help='Directory where the Argos Translate models are stored.')
