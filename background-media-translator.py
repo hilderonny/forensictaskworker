@@ -16,6 +16,7 @@ parser.add_argument('--outputpath', '-o', type=str, action='store', required=Tru
 parser.add_argument('--whisperpath', '-w', type=str, action='store', required=True, help='Directory where the Faster-Whisper models are stored.')
 parser.add_argument('--argospath', '-a', type=str, action='store', required=True, help='Directory where the Argos Translate models are stored.')
 parser.add_argument('--whispermodel', '-m', type=str, default='small', action='store', help='Whisper model size to use. Can be "tiny", "base", "small" (default), "medium" or "large-v2".')
+parser.add_argument('--usegpu', '-g', action='store_true', help='Use GPU for neural network calculations. Needs to have cuBLAS and cuDNN installed from https://github.com/Purfview/whisper-standalone-win/releases/tag/libs')
 parser.add_argument('--version', '-v', action='version', version=PROGRAM_VERSION)
 args = parser.parse_args()
 
@@ -60,16 +61,19 @@ if not os.access(ARGOSPATH, os.R_OK):
 if not os.access(ARGOSENDEPACKAGEPATH, os.R_OK):
     sys.exit(f'ERROR: Cannot read Argos Translate EN->DE model directory {ARGOSENDEPACKAGEPATH}')
 
+USEGPU = args.usegpu
+
 # Load Faster Whisper
 print('Loading Faster Whisper')
 from faster_whisper import WhisperModel    
-compute_type = 'int8'
-whisper_model = WhisperModel( model_size_or_path = args.whispermodel, device = 'cpu', local_files_only = False, compute_type = compute_type, download_root = args.whisperpath )
+compute_type = 'float16' if USEGPU else 'int8'
+device = 'cuda' if USEGPU else 'cpu'
+whisper_model = WhisperModel( model_size_or_path = args.whispermodel, device = device, local_files_only = False, compute_type = compute_type, download_root = args.whisperpath )
 
 # Load Argos translate
 print('Loading Argos Translate')
 os.environ['ARGOS_PACKAGES_DIR'] = os.path.join(args.argospath, 'packages')
-os.environ['ARGOS_DEVICE_TYPE'] = 'cpu'
+os.environ['ARGOS_DEVICE_TYPE'] = device
 global argos_translation
 import argostranslate.translate
 argos_translation = argostranslate.translate.get_translation_from_codes('en', 'de')
