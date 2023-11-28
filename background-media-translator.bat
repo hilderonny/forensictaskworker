@@ -6,3 +6,4 @@
  -w .\faster-whisper^
  -a .\argos-translate^
  -m large-v2
+ -g
