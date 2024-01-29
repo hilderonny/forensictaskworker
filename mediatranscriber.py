@@ -76,7 +76,7 @@ def process_file(file_path):
 
 def check_and_process_files():
 
-    req = requests.get(f"{APIURL}tasks/taketranscribetask/{WHISPERMODEL}/")
+    req = requests.get(f"{APIURL}tasks/transcribe/take/{WHISPERMODEL}/")
     if req.status_code == 400:
         error = req.json()["error"]
         print(error)
@@ -96,7 +96,7 @@ def check_and_process_files():
     result_to_report["englishtext"] = result["en"]["fulltext"]
     print(json.dumps(result_to_report, indent=2))
     print('Reporting result')
-    requests.post(f"{APIURL}tasks/reporttranscribecompletion/{data['id']}/", json=result_to_report)
+    requests.post(f"{APIURL}tasks/transcribe/reportcompletion/{data['id']}/", json=result_to_report)
     # TODO: Report result
     return True
 
@@ -107,9 +107,9 @@ try:
         file_was_processed = False
         try:
             file_was_processed = check_and_process_files()
-        finally:
+        except Exception:
             pass
         if file_was_processed == False:
             time.sleep(3)
-finally:
+except Exception:
     pass
