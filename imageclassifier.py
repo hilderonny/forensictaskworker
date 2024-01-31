@@ -3,8 +3,6 @@ PROGRAM_VERSION = '1.0.0'
 print(f'Image classifier Version {PROGRAM_VERSION}')
 
 import datetime
-import shutil
-import stat
 import json
 import time
 import numpy
@@ -90,7 +88,7 @@ def process_file(file_path):
 
 def check_and_process_files():
 
-    req = requests.get(f"{APIURL}tasks/classifyimage/take/{TARGETLANGUAGE}/")
+    req = requests.get(f"{APIURL}tasks/classifyimage/take/")
     if req.status_code == 400:
         error = req.json()["error"]
         print(error)
