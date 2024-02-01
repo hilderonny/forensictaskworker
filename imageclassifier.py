@@ -14,7 +14,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--apiurl', type=str, action='store', required=True, help='Root URL of the API of the forensic task bridge to use, e.g. https://hilderonny.github.io/forensictaskbridge/api/')
 parser.add_argument('--sharepath', type=str, action='store', required=True, help='Directory path where the image files to process are accessible.')
 parser.add_argument('--mobilenetpath', type=str, action='store', required=True, help='Directory where the MobileNetV3 Model and settings are stored.')
-parser.add_argument('--targetlanguage', type=str, default='en', action='store', help='Language of the output tags. Can be "en" (default) or "de".')
 parser.add_argument('--version', '-v', action='version', version=PROGRAM_VERSION)
 args = parser.parse_args()
 
@@ -30,14 +29,18 @@ if not os.access(SHAREPATH, os.R_OK | os.W_OK):
     sys.exit(f'ERROR: Cannot read share path {SHAREPATH}')
 print(f'Using share path {SHAREPATH}')
 MOBILENETPATH = args.mobilenetpath
-TARGETLANGUAGE = args.targetlanguage
-#LABELFILEPATH = os.path.join(MOBILENETPATH, f'imagenet.{TARGETLANGUAGE}.names')
+LABELFILEPATH = {
+    "en": os.path.join(MOBILENETPATH, 'imagenet.en.names'),
+    "de": os.path.join(MOBILENETPATH, 'imagenet.de.names'),
+}
 KERASPATH = os.path.join(MOBILENETPATH, 'keras')
 MODELFILEPATH = os.path.join(MOBILENETPATH, 'mobilenetv3large_model.keras')
 if not os.access(MOBILENETPATH, os.R_OK):
     sys.exit(f'ERROR: Cannot read MobileNet directory {MOBILENETPATH}')
-#if not os.access(LABELFILEPATH, os.R_OK):
-#    sys.exit(f'ERROR: Cannot read MobileNet label file {LABELFILEPATH}')
+for language in LABELFILEPATH:
+    filepath = LABELFILEPATH[language]
+    if not os.access(filepath, os.R_OK):
+        sys.exit(f'ERROR: Cannot read MobileNet label file {filepath}')
 if not os.access(KERASPATH, os.R_OK):
     sys.exit(f'ERROR: Cannot read Keras directory {KERASPATH}')
 if not os.access(MODELFILEPATH, os.R_OK):
@@ -45,13 +48,15 @@ if not os.access(MODELFILEPATH, os.R_OK):
 print(f'Using MobileNat path {MOBILENETPATH}')
 
 # Load classification labels
-#print(f'Loading labels for language {TARGETLANGUAGE}')
-#CLASSES = {}
-#with open(LABELFILEPATH, mode='r', encoding='utf-8') as f:
-#    for line in f.readlines():
-#        stripped_line = line.strip()
-#        id, text = stripped_line[:9], stripped_line[10:]
-#        CLASSES[id] = text
+print(f'Loading labels')
+CLASSES = { "en" : {}, "de" : {} }
+for language in LABELFILEPATH:
+    filepath = LABELFILEPATH[language]
+    with open(filepath, mode='r', encoding='utf-8') as f:
+        for line in f.readlines():
+            stripped_line = line.strip()
+            id, text = stripped_line[:9], stripped_line[10:]
+            CLASSES[language][id] = text
 
 # Import TensorFlow and MobileNet
 print('Loading TensorFlow and MobileNet V3')
@@ -64,7 +69,7 @@ from tensorflow.keras.applications.mobilenet_v3 import preprocess_input, decode_
 print('Loading model')
 MODEL = load_model(MODELFILEPATH, compile=False)
 
-def process_file(file_path):
+def process_file(file_path, language):
     start_time = datetime.datetime.now()
     result = {}
     try:
@@ -77,7 +82,7 @@ def process_file(file_path):
         first_prediction = best_predictions[0]
         result["predictions"] = [prediction[1] for prediction in best_predictions]
         result["class"] = first_prediction[0]
-        #result["name"] = CLASSES[first_prediction[0]]
+        result["name"] = CLASSES[language][first_prediction[0]]
         result["probability"] = float(first_prediction[2])
     except Exception as ex:
         print(ex)
@@ -98,7 +103,7 @@ def check_and_process_files():
     data = req.json()
     print(data)
     processing_file_path = os.path.join(SHAREPATH, data["filename"])
-    result_to_report = process_file(processing_file_path)
+    result_to_report = process_file(processing_file_path, data["targetlanguage"])
     print(json.dumps(result_to_report, indent=2))
     print('Reporting result')
     requests.post(f"{APIURL}tasks/classifyimage/reportcompletion/{data['id']}/", json=result_to_report)

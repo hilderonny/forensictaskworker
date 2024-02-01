@@ -14,7 +14,7 @@ Several workers for https://github.com/hilderonny/forensictaskbridge.
 python mediatranscriber.py --apiurl http://127.0.0.1:5000/api/ --sharepath D:\\data\\audio\\input --whisperpath D:\\data\\whisper --whispermodel tiny --usegpu
 ```
 
-## Installation
+## Installation for Windows
 
 Install Python 3.11.7 (NOT 3.12 - it causes a problem with faster-whisper installation) from https://www.python.org/downloads/release/python-3117/.
 The best is to download the portable version into a `python` subdirectory and also download https://bootstrap.pypa.io/get-pip.py.
@@ -34,6 +34,10 @@ python/python -m pip install -r requirements.txt
 ```
 
 To have GPU support you need to copy `cudnn_ops_infer64_8.dll`, `cudnn_cnn_infer64_8.dll`, `cublas64_11.dll`, `cublasLt64_11.dll` and `zlibwapi.dll` (Can be found at https://developer.nvidia.com/cudnn) into the directory `python/Lib/site-packages/ctranslate2`.
+
+## Installation for Linux as services
+
+
 
 ## Image classification
 
