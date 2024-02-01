@@ -11,15 +11,15 @@ import requests
 # Parse command line arguments
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument('--apiurl', '-a', type=str, action='store', required=True, help='Root URL of the API of the forensic task bridge to use, e.g. https://hilderonny.github.io/forensictaskbridge/api/')
-parser.add_argument('--sharepath', '-s', type=str, action='store', required=True, help='Directory path where the media file to process are accessible.')
-parser.add_argument('--whisperpath', '-w', type=str, action='store', required=True, help='Directory where the Faster-Whisper models are stored.')
-parser.add_argument('--whispermodel', '-m', type=str, default='small', action='store', help='Whisper model size to use. Can be "tiny", "base", "small" (default), "medium", "large-v2" or "large-v3".')
-parser.add_argument('--usegpu', '-g', action='store_true', help='Use GPU for neural network calculations. Needs to have cuBLAS and cuDNN installed from https://github.com/Purfview/whisper-standalone-win/releases/tag/libs')
+parser.add_argument('--apiurl', type=str, action='store', required=True, help='Root URL of the API of the forensic task bridge to use, e.g. https://hilderonny.github.io/forensictaskbridge/api/')
+parser.add_argument('--sharepath', type=str, action='store', required=True, help='Directory path where the media files to process are accessible.')
+parser.add_argument('--whisperpath', type=str, action='store', required=True, help='Directory where the Faster-Whisper models are stored.')
+parser.add_argument('--whispermodel', type=str, default='small', action='store', help='Whisper model size to use. Can be "tiny", "base", "small" (default), "medium", "large-v2" or "large-v3".')
+parser.add_argument('--usegpu', action='store_true', help='Use GPU for neural network calculations. Needs to have cuBLAS and cuDNN installed from https://github.com/Purfview/whisper-standalone-win/releases/tag/libs')
 parser.add_argument('--version', '-v', action='version', version=PROGRAM_VERSION)
 args = parser.parse_args()
 
-# Check write access to directories
+# Check access to directories
 import sys
 import os
 APIURL = args.apiurl
@@ -69,7 +69,7 @@ def process_file(file_path):
             result['en'] = { 'segments':  translation_segments_en, 'fulltext':  ''.join(map(lambda segment: segment['text'], translation_segments_en)) }
     except Exception as ex:
         print(ex)
-        result['exception'] = str(ex)
+        result['error'] = str(ex)
     end_time = datetime.datetime.now()
     result['duration'] = (end_time - start_time).total_seconds()
     return result
@@ -94,12 +94,13 @@ def check_and_process_files():
     result_to_report["language"] = result["language"]
     result_to_report["originaltext"] = result["original"]["fulltext"]
     result_to_report["englishtext"] = result["en"]["fulltext"]
+    result_to_report["duration"] = result["duration"]
+    if (result["error"]):
+        result_to_report["error"] = result["error"]
     print(json.dumps(result_to_report, indent=2))
     print('Reporting result')
     requests.post(f"{APIURL}tasks/transcribe/reportcompletion/{data['id']}/", json=result_to_report)
-    # TODO: Report result
     return True
-
 
 try:
     print('Ready and waiting for action')

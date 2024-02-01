@@ -6,6 +6,7 @@ import time
 import os
 import json
 import requests
+import datetime
 
 # Parse command line arguments
 import argparse
@@ -16,7 +17,7 @@ parser.add_argument('--usegpu', action='store_true', help='Use GPU for neural ne
 parser.add_argument('--version', '-v', action='version', version=PROGRAM_VERSION)
 args = parser.parse_args()
 
-# Check write access to directories
+# Check access to directories
 import sys
 import os
 APIURL = args.apiurl
@@ -46,6 +47,7 @@ import argostranslate.translate
 import argostranslate.package
 
 def check_and_process():
+    start_time = datetime.datetime.now()
     req = requests.get(f"{APIURL}tasks/translate/take/")
     if req.status_code == 400:
         error = req.json()["error"]
@@ -71,6 +73,8 @@ def check_and_process():
         argos_translation = from_lang.get_translation(to_lang)
         translatedtext = argos_translation.translate(texttotranslate)
         result_to_report["translatedtext"] = translatedtext
+    end_time = datetime.datetime.now()
+    result_to_report["duration"] = (end_time - start_time).total_seconds()
     print(json.dumps(result_to_report, indent=2))
     print('Reporting result')
     requests.post(f"{APIURL}tasks/translate/reportcompletion/{data['id']}/", json=result_to_report)
