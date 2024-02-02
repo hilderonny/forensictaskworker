@@ -82,7 +82,7 @@ export CUDA_VISIBLE_DEVICES=0
 export LD_LIBRARY_PATH=`./python-venv/bin/python -c 'import os; import nvidia.cublas.lib; import nvidia.cudnn.lib; print(os.path.dirname(nvidia.cublas.lib.__file__) + ":" + os.path.dirname(nvidia.cudnn.lib.__file__))'`
 export CUDA_VISIBLE_DEVICES=0
 
-./python-venv/bin/python ./texttranslator.py --apiurl http://127.0.0.1:30000/api/ --sharepath /data/input --argospath /argos-translate --usegpu
+./python-venv/bin/python ./texttranslator.py --apiurl http://127.0.0.1:30000/api/ --argospath /argos-translate --usegpu
 ```
 
 Next create Systemd service files.
