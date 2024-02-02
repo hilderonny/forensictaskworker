@@ -1,8 +1,4 @@
-import time
 import os
-import json
-import datetime
-import requests
 
 # Parse command line arguments
 import argparse

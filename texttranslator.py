@@ -59,7 +59,7 @@ def check_and_process():
     print(data)
     sourcelanguage = data["sourcelanguage"]
     targetlanguage = data["targetlanguage"]
-    texttotranslate = data["text"]
+    segmentstotranslate = data["segments"]
     result_to_report = {}
     from_lang = argostranslate.translate.get_language_from_code(sourcelanguage)
     to_lang = argostranslate.translate.get_language_from_code(targetlanguage)
@@ -71,8 +71,14 @@ def check_and_process():
         result_to_report["error"] = f"Language {targetlanguage} is not supported"
     else:
         argos_translation = from_lang.get_translation(to_lang)
-        translatedtext = argos_translation.translate(texttotranslate)
-        result_to_report["translatedtext"] = translatedtext
+        result_to_report["segments"] = []
+        for segment in segmentstotranslate:
+            translatedsegment = {
+                "start": segment["start"],
+                "end": segment["end"],
+                "text": argos_translation.translate(segment["text"])
+            }
+            result_to_report["segments"].append(translatedsegment)
     end_time = datetime.datetime.now()
     result_to_report["duration"] = (end_time - start_time).total_seconds()
     print(json.dumps(result_to_report, indent=2))
@@ -86,8 +92,8 @@ try:
         text_was_processed = False
         try:
             text_was_processed = check_and_process()
-        except Exception:
-            pass
+        except Exception as ex:
+            print(ex)
         if text_was_processed == False:
             time.sleep(3)
 except Exception:

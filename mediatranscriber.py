@@ -59,14 +59,14 @@ def process_file(file_path):
         transcribe_segments = list(map(lambda segment: { 'start': segment.start, 'end': segment.end, 'text': segment.text }, transcribe_segments_generator))
         original_language = transcribe_info.language
         result['language'] = original_language
-        result['original'] = { 'segments': transcribe_segments, 'fulltext':  ' '.join(map(lambda segment: segment['text'], transcribe_segments)) }
+        result['original'] = { 'segments': transcribe_segments }
         if original_language == 'en': # Englisch muss nicht ins Englische uebersetzt werden
             result['en'] = result['original']
         else:
             print('Translating into english')
             translation_segments_generator_en, _ = whisper_model.transcribe(file_path, task = 'translate')
             translation_segments_en = list(map(lambda segment: { 'start': segment.start, 'end': segment.end, 'text': segment.text }, translation_segments_generator_en))
-            result['en'] = { 'segments':  translation_segments_en, 'fulltext':  ''.join(map(lambda segment: segment['text'], translation_segments_en)) }
+            result['en'] = { 'segments':  translation_segments_en }
     except Exception as ex:
         print(ex)
         result['error'] = str(ex)
@@ -87,19 +87,10 @@ def check_and_process_files():
     print(data)
     processing_file_path = os.path.join(SHAREPATH, data["filename"])
     result = process_file(processing_file_path)
-    if "error" in result:
-        print(result["error"])
-        return False
-    result_to_report = {}
-    result_to_report["language"] = result["language"]
-    result_to_report["originaltext"] = result["original"]["fulltext"]
-    result_to_report["englishtext"] = result["en"]["fulltext"]
-    result_to_report["duration"] = result["duration"]
-    if (result["error"]):
-        result_to_report["error"] = result["error"]
-    print(json.dumps(result_to_report, indent=2))
+    print(result)
     print('Reporting result')
-    requests.post(f"{APIURL}tasks/transcribe/reportcompletion/{data['id']}/", json=result_to_report)
+    requests.post(f"{APIURL}tasks/transcribe/reportcompletion/{data['id']}/", json=result)
+    print('Done')
     return True
 
 try:
@@ -108,8 +99,8 @@ try:
         file_was_processed = False
         try:
             file_was_processed = check_and_process_files()
-        except Exception:
-            pass
+        except Exception as ex:
+            print(ex)
         if file_was_processed == False:
             time.sleep(3)
 except Exception:

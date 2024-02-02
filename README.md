@@ -37,7 +37,121 @@ To have GPU support you need to copy `cudnn_ops_infer64_8.dll`, `cudnn_cnn_infer
 
 ## Installation for Linux as services
 
+```
+sudo apt install -y git python3.11-env ocl-icd-libopencl1 nvidia-cuda-toolkit nvidia-utils-510-server nvidia-utils-535-server
+git clone https://github.com/hilderonny/forensictaskworker.git
+cd forensictaskworker
+python3.11 -m venv python-venv
+source python-venv/bin/activate
+pip install -r requirements.txt
+```
 
+A restart may be required. Setup an internet connection and download the required ANN models.
+
+```
+ ./python-venv/bin/python ./argosupdate.py --argospath /argos-translate/
+ ./python-venv/bin/python ./mobilenetupdate.py --mobilenetpath /mobilenet/
+```
+
+Create shell scripts for the several workers with the following contents.
+
+**imageclassifier.sh**:
+
+```
+#!/bin/sh
+
+./python-venv/bin/python ./imageclassifier.py --apiurl http://127.0.0.1:30000/api/ --sharepath /data/input --mobilenetpath /mobilenet
+```
+
+**mediatranscriber.sh**:
+
+```
+#!/bin/sh
+
+export LD_LIBRARY_PATH=`./python-venv/bin/python -c 'import os; import nvidia.cublas.lib; import nvidia.cudnn.lib; print(os.path.dirname(nvidia.cublas.lib.__file__) + ":" + os.path.dirname(nvidia.cudnn.lib.__file__))'`
+export CUDA_VISIBLE_DEVICES=0
+
+./python-venv/bin/python ./mediatranscriber.py --apiurl http://127.0.0.1:30000/api/ --sharepath /data/input --whisperpath /faster-whisper --usegpu --whispermodel large-v2
+```
+
+**texttranslator.sh**:
+
+```
+#!/bin/sh
+
+export LD_LIBRARY_PATH=`./python-venv/bin/python -c 'import os; import nvidia.cublas.lib; import nvidia.cudnn.lib; print(os.path.dirname(nvidia.cublas.lib.__file__) + ":" + os.path.dirname(nvidia.cudnn.lib.__file__))'`
+export CUDA_VISIBLE_DEVICES=0
+
+./python-venv/bin/python ./texttranslator.py --apiurl http://127.0.0.1:30000/api/ --sharepath /data/input --argospath /argos-translate --usegpu
+```
+
+Next create Systemd service files.
+
+**/etc/systemd/system/forensictaskworker_imageclassifier.service**:
+
+```
+[Unit]
+Description=Forensic Task Worker - Image Classifier
+
+[Service]
+ExecStart=/forensictaskworker/imageclassifier.sh
+Restart=always
+User=user
+WorkingDirectory=/forensictaskworker/
+
+[Install]
+WantedBy=multi-user.target
+```
+
+**/etc/systemd/system/forensictaskworker_mediatranscriber.service**:
+
+```
+[Unit]
+Description=Forensic Task Worker - Media Transcriber
+
+[Service]
+ExecStart=/forensictaskworker/mediatranscriber.sh
+Restart=always
+User=user
+WorkingDirectory=/forensictaskworker/
+
+[Install]
+WantedBy=multi-user.target
+```
+
+**/etc/systemd/system/forensictaskworker_texttranslator.service**:
+
+```
+[Unit]
+Description=Forensic Task Worker - Text Translator
+
+[Service]
+ExecStart=/forensictaskworker/texttranslator.sh
+Restart=always
+User=user
+WorkingDirectory=/forensictaskworker/
+
+[Install]
+WantedBy=multi-user.target
+```
+
+You can now test the workers by running their shell scripts. This is highly recommended because `imageclassifier` and `mediatranscriber` download additional files at the first work. So make sure tio have an internet connection at this time.
+
+Finally register and start the services.
+
+```
+chmod +x ./*.sh
+
+sudo systemctl daemon-reload
+
+sudo systemctl enable forensictaskworker_imageclassifier.service
+sudo systemctl enable forensictaskworker_mediatranscriber.service
+sudo systemctl enable forensictaskworker_texttranslator.service
+
+sudo systemctl start forensictaskworker_imageclassifier.service
+sudo systemctl start forensictaskworker_mediatranscriber.service
+sudo systemctl start forensictaskworker_texttranslator.service
+```
 
 ## Image classification
 
@@ -47,10 +161,10 @@ Before the first use the MobileNet models must be downloaded. Make sure you have
 python\python mobilenetupdate.py --mobilenetpath /mobilenet
 ```
 
-Next you can run the worker with this command.
+Next you can run the worker with this command. On first run the worker downloads a file needed for class identification from https://storage.googleapis.com/download.tensorflow.org/data/imagenet_class_index.json so make sure you have an internet connection.
 
 ```
-python\python imageclassifier.py --apiurl http://127.0.0.1:5000/api/ --sharepath /data/input --mobilenetpath /mobilenet --targetlanguage de
+python\python imageclassifier.py --apiurl http://127.0.0.1:5000/api/ --sharepath /data/input --mobilenetpath /mobilenet
 ```
 
 ## Media transcription
@@ -72,5 +186,5 @@ python/pythonpython argosupdate.py --argospath /argos-translate
 The worker can be run this way.
 
 ```
-python/pythonpython texttranslator.py --apiurl http://127.0.0.1:5000/api/ --argospath /argos-translate --sourcelanguage en --targetlanguage de --usegpu
+python/pythonpython texttranslator.py --apiurl http://127.0.0.1:5000/api/ --argospath /argos-translate --usegpu
 ```
