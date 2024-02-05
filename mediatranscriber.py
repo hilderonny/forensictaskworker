@@ -89,7 +89,9 @@ def check_and_process_files():
     result = process_file(processing_file_path)
     print(result)
     print('Reporting result')
-    requests.post(f"{APIURL}tasks/transcribe/reportcompletion/{data['id']}/", json=result)
+    report_req = requests.post(f"{APIURL}tasks/transcribe/reportcompletion/{data['id']}/", json=result)
+    if report_req.status_code != 200:
+        print(req.text)
     print('Done')
     return True
 
