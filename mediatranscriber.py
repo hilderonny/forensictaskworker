@@ -49,7 +49,7 @@ compute_type = 'float16' if USEGPU else 'int8'
 device = 'cuda' if USEGPU else 'cpu'
 whisper_model = WhisperModel( model_size_or_path = WHISPERMODEL, device = device, local_files_only = False, compute_type = compute_type, download_root = WHISPERPATH )
 
-def process_file(file_path):
+def process_file(file_path, notranslationlanguage = None):
     start_time = datetime.datetime.now()
     result = {}
     try:
@@ -62,7 +62,7 @@ def process_file(file_path):
         result['original'] = { 'segments': transcribe_segments }
         if original_language == 'en': # Englisch muss nicht ins Englische uebersetzt werden
             result['en'] = result['original']
-        else:
+        elif not original_language == notranslationlanguage: # Wenn die erkannte Sprache der nicht-zu-uebersetzenden gleicht, dann halt nicht uebersetzen
             print('Translating into english')
             translation_segments_generator_en, _ = whisper_model.transcribe(file_path, task = 'translate')
             translation_segments_en = list(map(lambda segment: { 'start': segment.start, 'end': segment.end, 'text': segment.text }, translation_segments_generator_en))
@@ -86,7 +86,7 @@ def check_and_process_files():
     data = req.json()
     print(data)
     processing_file_path = os.path.join(SHAREPATH, data["filename"])
-    result = process_file(processing_file_path)
+    result = process_file(processing_file_path, data["notranslationlanguage"])
     print(result)
     print('Reporting result')
     report_req = requests.post(f"{APIURL}tasks/transcribe/reportcompletion/{data['id']}/", json=result)
