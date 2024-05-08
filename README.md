@@ -158,7 +158,7 @@ sudo systemctl start forensictaskworker_texttranslator.service
 Before the first use the MobileNet models must be downloaded. Make sure you have an internet connection and run the following script.
 
 ```
-python\python mobilenetupdate.py --mobilenetpath /mobilenet
+python/python mobilenetupdate.py --mobilenetpath /mobilenet
 ```
 
 Next you can run the worker with this command. On first run the worker downloads a file needed for class identification from https://storage.googleapis.com/download.tensorflow.org/data/imagenet_class_index.json so make sure you have an internet connection.
