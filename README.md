@@ -23,7 +23,7 @@ Next insert the following lines into the file `python/python311._pth`
 
 ```
 Scripts
-Lib\site-packages
+Lib/site-packages
 ```
 
 and run the following commands from the repository directory
@@ -164,7 +164,7 @@ python\python mobilenetupdate.py --mobilenetpath /mobilenet
 Next you can run the worker with this command. On first run the worker downloads a file needed for class identification from https://storage.googleapis.com/download.tensorflow.org/data/imagenet_class_index.json so make sure you have an internet connection.
 
 ```
-python\python imageclassifier.py --apiurl http://127.0.0.1:5000/api/ --sharepath /data/input --mobilenetpath /mobilenet
+python/python imageclassifier.py --apiurl http://127.0.0.1:5000/api/ --sharepath /data/input --mobilenetpath /mobilenet
 ```
 
 ## Media transcription
@@ -180,11 +180,11 @@ python/python mediatranscriber.py --apiurl http://127.0.0.1:5000/api/ --sharepat
 For the first use you need to download ind install all available translation packes via the followinf command. Make sure that the `argospath` directory exists.
 
 ```
-python/pythonpython argosupdate.py --argospath /argos-translate  
+python/python argosupdate.py --argospath /argos-translate  
 ```
 
 The worker can be run this way.
 
 ```
-python/pythonpython texttranslator.py --apiurl http://127.0.0.1:5000/api/ --argospath /argos-translate --usegpu
+python/python texttranslator.py --apiurl http://127.0.0.1:5000/api/ --argospath /argos-translate --usegpu
 ```
