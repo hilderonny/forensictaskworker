@@ -1,2 +1,6 @@
 python*/
 test/
+malwarescanner/clamav/
+malwarescanner/log
+malwarescanner/database
+clamd.pid
