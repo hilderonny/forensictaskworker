@@ -32,6 +32,7 @@ available_packages = package.get_available_packages()
 
 # Download and install all available packages
 for available_package in available_packages:
-    print(f'Installing package {available_package.from_code} -  {available_package.to_code}')
-    download_path = available_package.download()
-    package.install_from_path(download_path)
+    if available_package.from_code == "en" and available_package.to_code == "de":
+        print(f'Installing package {available_package.from_code} -  {available_package.to_code}')
+        download_path = available_package.download()
+        package.install_from_path(download_path)
